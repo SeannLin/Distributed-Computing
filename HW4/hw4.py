@@ -21,6 +21,56 @@ from builtins import round
 
 from user_definition import *
 
+def train_rf_cv(df_train, df_valid, n_tree, n_fold, n_digits):
+    # Create model instance
+    rf = RandomForestClassifier(numTrees=n_tree)
+
+    # Set the metric
+    evaluator = BinaryClassificationEvaluator()
+
+    # create the cross validator
+    cv = CrossValidator()\
+        .setEstimator(rf)\
+        .setEvaluator(evaluator)\
+        .setNumFolds(n_fold)
+
+    # setting for cross validator
+    paramGrid = ParamGridBuilder().build()
+    cv.setEstimatorParamMaps(paramGrid)
+
+    # fit the model using cross validator
+    cv_model = cv.fit(df_train)
+
+    # prediction
+    rf_predict = cv_model.bestModel.transform(df_valid)
+
+    return round(evaluator.evaluate(rf_predict), n_digits)
+
+def train_gbt_cv(df_train, df_valid, depth, n_fold, n_digits):
+    # Create model instance
+    gbt = GBTClassifier(maxDepth=depth)
+
+    # Set the metric
+    evaluator = BinaryClassificationEvaluator()
+
+    # create the cross validator
+    cv = CrossValidator()\
+        .setEstimator(gbt)\
+        .setEvaluator(evaluator)\
+        .setNumFolds(n_fold)
+
+    # setting for cross validator
+    paramGrid = ParamGridBuilder().build()
+    cv.setEstimatorParamMaps(paramGrid)
+
+    # fit the model using cross validator
+    cv_model = cv.fit(df_train)
+
+    # prediction
+    gbt_predict = cv_model.bestModel.transform(df_valid)
+
+    return round(evaluator.evaluate(gbt_predict), n_digits)
+
 ss = SparkSession.builder\
     .config('spark.driver.memory', '16g')\
     .config('spark.executor.memory', '16g')\
@@ -34,17 +84,10 @@ df_valid = ss.read.parquet(valid_folder)
 print(df_valid.count())
 print()
 
-def rf_train(df_train, df_valid, num_trees):
-    rf = RandomForestClassifier(numTrees=num_trees)
-    rf_model = rf.fit(df_train)
-    rf_predict = rf_model.transform(df_valid)
-    evaluator = BinaryClassificationEvaluator()
-    return round(evaluator.evaluate(rf_predict), n_digits)
-
 best_score = 0
 best_num = 0
 for num in num_trees:
-    score = rf_train(df_train, df_valid, num)
+    score = train_rf_cv(df_train, df_valid, num, n_fold, n_digits)
     if score > best_score:
         best_score = score
         best_num = num
@@ -57,11 +100,7 @@ print()
 best_depth = 0
 best_score = 0
 for d in max_depth:
-    gbt = GBTClassifier(maxDepth=d)
-    model_gbt = gbt.fit(df_train)
-    predict_gbt = model_gbt.transform(df_valid)
-    evaluator = BinaryClassificationEvaluator()
-    score = round(evaluator.evaluate(predict_gbt), n_digits)
+    score = train_gbt_cv(df_train, df_valid, d, n_fold, n_digits)
     if score > best_score:
         best_score = score
         best_depth = d
