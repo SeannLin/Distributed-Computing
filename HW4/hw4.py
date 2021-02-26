@@ -54,74 +54,6 @@ print(best_num)
 print(best_score)
 print()
 
-
-
-# model_rf = RandomForestClassifier(numTrees=10)
-# metric_bclass = BinaryClassificationEvaluator()
-# cv = CrossValidator()\
-#     .setEstimator(model_rf)\
-#     .setEvaluator(metric_bclass)\
-#     .setNumFolds(n_fold)
-#
-# paramGrid = ParamGridBuilder().build()
-# cv.setEstimatorParamMaps(paramGrid)
-#
-# cvmodel = cv.fit(df_train)
-# print(BinaryClassificationEvaluator()
-#       .evaluate(cvmodel.bestModel.transform(df_valid)))
-#
-#
-#
-#
-# def train_rf_cv(df_train, df_valid, n_tree, n_fold, n_digits):
-#     # Create model instance
-#     rf = RandomForestClassifier(numTrees=n_tree)
-#
-#     # Set the metric
-#     metric = BinaryClassificationEvaluator()
-#
-#     # create the cross validator
-#     cv = CrossValidator()\
-#         .setEstimator(model_rf)\
-#         .setEvaluator(metric)\
-#         .setNumFolds(n_fold)
-#
-#     # setting for cross validator
-#     paramGrid = ParamGridBuilder().build()
-#     cv.setEstimatorParamMaps(paramGrid)
-#
-#     # fit the model using cross validator
-#     cv_model = cv.fit(df_train)
-#
-#     # prediction
-#     rf_predict = cv_model.bestModel.transform(df_valid)
-#
-#     return round(metric.evaluate(rf_predict), n_digits)
-#
-#
-#
-#
-# best_score = 0
-# best_num = 0
-# for n_tree in num_trees:
-#     score = train_rf_cv(df_train, df_valid, n_tree, n_fold, n_digits)
-#     if score > best_score:
-#         best_score = score
-#         best_num = num
-#
-# print(best_num)
-# print(best_score)
-
-
-
-
-# gbt = GBTClassifier()
-# model_gbt = gbt.fit(df_train)
-# predict_gbt = model_gbt.transform(df_valid)
-# evaluator = BinaryClassificationEvaluator()
-# round(evaluator.evaluate(predict_gbt), n_digits)
-
-
 best_depth = 0
 best_score = 0
 for d in max_depth:
@@ -137,9 +69,5 @@ for d in max_depth:
 print(GBTClassifier.__name__)
 print(best_depth)
 print(best_score)
-
-
-
-# print(cvmodel.bestModel.getMaxIter(), end='\n\n')
 
 ss.stop()
